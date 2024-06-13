@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Similarity Detection</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Music Similarity Detection</h1>
+        <nav>
+            <a href="#introduction">Introduction</a>
+            <a href="#data">Data</a>
+            <a href="#process">Process</a>
+            <a href="#visualization">Visualization</a>
+            <a href="#metrics">Evaluation Metrics</a>
+        </nav>
+    </header>
+
+    <section id="introduction">
+        <h2>Introduction</h2>
+        <p>
+            In this project, we detect the similarity of music for a given dataset of songs. The dataset consists of 20 Telugu songs in MP3 format.
+            The MusiCNN model is used for evaluating similarity between the songs. Evaluation metrics such as average precision@10, MAP@10, and MAP@50 are computed across the entire dataset.
+        </p>
+    </section>
+
+    <section id="data">
+        <h2>Data</h2>
+        <p>
+            The dataset consists of 20 Telugu songs in MP3 format. Each song is assigned to one or more genres, which are used to evaluate the similarity between the songs.
+        </p>
+    </section>
+
+    <section id="process">
+        <h2>Process</h2>
+        <h3>1. Importing Necessary Libraries</h3>
+        <p>
+            The project uses several libraries including TensorFlow for the model, librosa for audio processing, scikit-learn for evaluation metrics, and Plotly for data visualization.
+        </p>
+
+        <h3>2. Downloading the Model</h3>
+        <p>
+            The MusiCNN model is downloaded and loaded for use in extracting embeddings from the songs.
+        </p>
+
+        <h3>3. Defining Genres</h3>
+        <p>
+            Each song is assigned to one or more genres which are then encoded using MultiLabelBinarizer.
+        </p>
+
+        <h3>4. Audio Processing</h3>
+        <p>
+            Audio files are processed using librosa to extract log mel spectrograms, which are then used to compute song embeddings using the MusiCNN model.
+        </p>
+
+        <h3>5. Extracting Embeddings</h3>
+        <p>
+            Embeddings are extracted from each song using the MusiCNN model. These embeddings are used to compute the similarity between songs.
+        </p>
+
+        <h3>6. Calculating Similarity</h3>
+        <p>
+            Cosine similarity is used to calculate the similarity between song embeddings.
+        </p>
+    </section>
+
+    <section id="visualization">
+        <h2>Data Visualization</h2>
+        <div id="similarityChart"></div>
+        <div id="histograms"></div>
+        <div id="map"></div>
+    </section>
+
+    <section id="metrics">
+        <h2>Evaluation Metrics</h2>
+        <p>
+            We compute various metrics such as precision@k and average precision@N to evaluate the similarity results. Mean Average Precision (MAP) is also calculated for each genre and the entire dataset.
+        </p>
+    </section>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
