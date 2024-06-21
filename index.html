@@ -1,92 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Similarity Detection</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <title>Music Similarity</title>
 </head>
+
 <body>
-    <header>
-        <h1>Music Similarity Detection</h1>
-        <nav>
-            <a href="#introduction">Introduction</a>
-            <a href="#data">Data</a>
-            <a href="#process">Process</a>
-            <a href="#visualization">Visualization</a>
-            <a href="#metrics">Evaluation Metrics</a>
-        </nav>
-    </header>
+    <h1> Music Similarity - Automate finding similar songs</h1>
+    <p>
+        This project is an experiment at automating the process of finding similarity between songs.
+        It uses <a href="https://github.com/jordipons/musicnn">MusiCNN</a>, a set of pre-trained musically
+        motivated convolutional neural networks to extract embeddings from the dataset of mp3 files. Then,
+        the embeddings are compared on various metrics to identify songs similar to one another. This project
+        is heavily inspired by the <a href="https://github.com/minguezalba/MusiCNN-embeddings">MusiCNN-embeddings</a>
+        repository and much of the script is taken from it.
+    </p>
 
-    <section id="introduction">
-        <h2>Introduction</h2>
-        <p>
-            In this project, we detect the similarity of music for a given dataset of songs. The dataset consists of 20 Telugu songs in MP3 format.
-            The MusiCNN model is used for evaluating similarity between the songs. Evaluation metrics such as average precision@10, MAP@10, and MAP@50 are computed across the entire dataset.
-        </p>
-    </section>
+    <h2 id="Dataset-subh" class="subheadings">Model Precision</h2>
+    <p>
+        The dataset originally used on the model is a list of 20 telugu songs arbitrarily chosen
+        and the genre of the songs is manually determined. The songs are in the dataset as mp3 files and
+        are processed to extract mel spectograms, which are passed on the model to extract
+        the embeddings. The genres are used to measure the precision of the model using AP@N and MAP@N.
+        These metrics are explained as:
+        <br><br>
+        <b>AP@N</b>: Average Precision at top N elements.
+        <br>
+        <b>MAP@N</b>: Mean Average Precision for each genre at top N elements.
+    </p>
+    <p>
+        The songs are passed through the model and the embeddings are extracted, and the data is visualised in
+        the form of a heatmap as below, with the redder parts pointing to more similar songs and the bluer
+        ones pointing to less similarity.
+    </p>
 
-    <section id="data">
-        <h2>Data</h2>
-        <div id="table-container"></div>
-    </section>
+    <div id="similarity-chart" class="heatmaps"></div>
 
-    <section id="data">
-        <h2>Data</h2>
-        <p>
-            The dataset consists of 20 Telugu songs in MP3 format. Each song is assigned to one or more genres, which are used to evaluate the similarity between the songs.
-        </p>
-    </section>
+    <p>
+        This visualisation is further helped using a network visualisation from
+        <a href="https://gramener.com/gramex-network/#/">gramex</a>, which clearly shows the songs that are more
+        similar to each other clustering together, which helps identify which songs that are closer to each other
+        from the given data.
+    </p>
 
-    <section id="process">
-        <h2>Process</h2>
-        <h3>1. Importing Necessary Libraries</h3>
-        <p>
-            The project uses several libraries including TensorFlow for the model, librosa for audio processing, scikit-learn for evaluation metrics, and Plotly for data visualization.
-        </p>
+    <svg id="network" class="network" width="800" height="600"></svg>
 
-        <h3>2. Downloading the Model</h3>
-        <p>
-            The MusiCNN model is downloaded and loaded for use in extracting embeddings from the songs.
-        </p>
+    <p>
+        We can observe that there are essentially two bunches of the nodes in the network. Out of 9 songs in the
+        "Romantic, Melody" category, 5 are in the right bunch and 2 are the nearest nodes to the right bunch,
+        within the left bunch. This is a good sign that the model is able to place these together. However, let us move
+        on to some more mathematical calculation for the precision.
+    </p>
 
-        <h3>3. Defining Genres</h3>
-        <p>
-            Each song is assigned to one or more genres which are then encoded using MultiLabelBinarizer.
-        </p>
+    <p>
+        To measure the model precision, let us consider the AP@N of each song with respect to a genre,
+        for a predetermined value of N. Since the dataset is very small with only 20 songs,
+        [3, 5, 10, 13, 15] are considered as range of N. The results are as follows:
+    </p>
 
-        <h3>4. Audio Processing</h3>
-        <p>
-            Audio files are processed using librosa to extract log mel spectrograms, which are then used to compute song embeddings using the MusiCNN model.
-        </p>
+    <div id="table-container-2"></div>
 
-        <h3>5. Extracting Embeddings</h3>
-        <p>
-            Embeddings are extracted from each song using the MusiCNN model. These embeddings are used to compute the similarity between songs.
-        </p>
+    <p>
+        The above data is used to calculate the mean average precision, MAP@N for each genre.
+        The table below shows the MAP@N of each genre, and then the mean value across the dataset.
+    </p>
+    <div id="table-container-3"></div>
 
-        <h3>6. Calculating Similarity</h3>
-        <p>
-            Cosine similarity is used to calculate the similarity between song embeddings.
-        </p>
-    </section>
+    <p>
+        The graph below better provides a visualisation for the above data:
+    </p>
+    <div id="mean-precision-graph"></div>
 
-    <section id="visualization">
-        <h2>Data Visualization</h2>
-        <div id="similarityChart"></div>
-        <div id="histograms"></div>
-        <div id="map"></div>
-    </section>
+    <p>
+        Thus, we conclude that the model has around an 80% mean average precision for 3 songs and a
+        70% mean average precision for predicting 5 songs out of a dataset
+        of 20 songs. The model can reasonably cluster songs by their genres, and performs well even on such a small
+        dataset.
+    </p>
+    <br>
 
-    <section id="metrics">
-        <h2>Evaluation Metrics</h2>
-        <p>
-            We compute various metrics such as precision@k and average precision@N to evaluate the similarity results. Mean Average Precision (MAP) is also calculated for each genre and the entire dataset.
-        </p>
-    </section>
 
-    <script src="script.js"></script>
+    <h2 class="subheadings">Splitting the songs into different instruments</h2>
+
+    <p>
+        We have analysed the model's performance on the full songs, but what if we could split the song
+        into different instruments and measure the performance on each of those?
+    </p>
+    <p>
+        <a href="https://github.com/adefossez/demucs">Demucs</a> is a music seperation model that can separate
+        drums, bass and vocals from the rest of the accompaniment. It automatically separates and creates
+        .wav files for each of them. The "others" file contains the full accompaniment which does not include
+        the aforementioned parts.
+    </p>
+
+    <p>
+        The new files are run through the model and the embeddings are extracted and put through the same
+        tests as the previous data. The mAP is calculated as follows for each type:
+    </p>
+
+    <div id="table-container-4"></div>
+
+    <p>
+        The precision for any individual instrument is slightly lower or the same as the overall mean precision.
+        This suggests that separating the instruments does not have a significant impact on the model.
+    </p>
+
+    <h2 class="subheadings">Comparing two singers</h2>
+
+    <p>
+        The songs of two famous singers in Telugu cinema, Sid Sriram and SP Balasubrahmanyam are run through the
+        model in the same procedure as before. The data is then analysed and plotted in the same way as above.
+        The results can show the differences in the music styles, voices and especially the genres in which the
+        singers sing more in.
+    </p>
+
+    <p>
+        The below is a heatmap of the similarities between the 80 songs in the dataset. Most of the values are
+        mostly between 0.85 and 1.0 except for a few outliers. Hence the data is normalized to be between the
+        values 0.85 to 1.0. The first 40 songs are of SP Balasubrahmanyam and the last 40 are of Sid Sriram.
+    </p>
+
+    <div id="singers-similarity-chart" class="heatmaps"></div>
+
+    <p>
+        Not much insight can be gained from the above heatmap, because of the lack of context.
+        A better way would be to again draw a graphical network using the songs as the nodes
+        and the similarities as the links. The below shows the network of the same, with red nodes
+        signifying SPB songs and blue nodes Sid Sriram songs.
+    </p>
+
+    <svg id="network2" class="network" width="1500" height="1000"></svg>
+
+    <p>
+        The graph shows three different clusters of nodes. One has more red than the others, one has equal amounts
+        and the other has more blue nodes than red. However the difference is not quite clear. This suggests that
+        the model can somewhat differentiate between the singers and group their songs, but it can't reliably
+        predict the singer. The blue nodes are more spread out and sometimes isolated , which suggests the songs
+        selected from Sid Sriram might be of more varied genres.
+    </p>
+
+    <p>
+        Let us now try to use 'demucs' on this, and only seperate the vocals from the songs. Will the model be
+        able to distinguish the singers with only their voices and no other background music?
+        <br>
+        A below is the visualisation for the same:
+    </p>
+
+    <svg id="network3" class="network" width="1500" height="1000"></svg>
+
+    <p>
+        The central portion of the graph is densely populated with both red and blue nodes, indicating a high
+        degree of similarity among these songs. Unlike the previous graph, where there were some distinct clusters
+        for each singer, this graph shows a more integrated cluster where songs from both singers are intermixed.
+        This suggests that the model cannot tell the difference based on the voice of the singer only, and needs
+        other factors such as style, genre and theme. This also highlights the importance of additional musical
+        context beyond just vocals for accurate similarity detection.
+    </p>
+
+    <h2 class="subheadings">Comparing five music directors</h2>
+
+    <p>
+        Let us try to compare five telugu cinema music directors,
+        and test if the model can tell the differences between their musical styles.
+    </p>
+
+    <p>
+        The music directors selected are Devi Sri Prasad, Keeravani, A.R.Rahman, Mickey J. Meyer and S. Thaman.
+        10 songs are selected randomly from each of them. The following network shows a visualisation of the
+        similarities between them:
+    </p>
+
+    <svg id="network4" class="network" width="1000" height="700"></svg>
+
+    <p>
+        The above network shows all the colours pretty mingled among each other. Dark blue nodes, which signify
+        Mickey J Meyer songs seem to be more similar to each other than any others. This suggests that he has a
+        unique style of music and his music is the most similar to itself. Other than that, all of the nodes are
+        pretty spread out throughout the graph, not bunching by colour. Hence we can conclude that the model is
+        not very good at identifying the musical styles of these music directors, with the given dataset.
+    </p>
+
+    <h2 class="subheadings">Comparing different decades of music</h2>
+
+    <p>
+        Finally, let us see how music has evolved over the decades. This can give us an insight on how the model
+        can capture musical trends and evolving styles over longer periods of time.
+    </p>
+
+    <p>
+        The dataset selected is 20 songs each from the 1980s and the 2010s. The yellow nodes represent 1980s songs
+        and the pink nodes represent 2010s songs.
+    </p>
+
+    <svg id="network5" class="network" width="800" height="600"></svg>
+
+    <p>
+        The yellow nodes and pink nodes tend to cluster within themselves. This suggests that each decade holds a
+        certain degree of similarity to itself in respect to its music, and the model is able to detect this quite
+        well. There are also some yellow nodes that are very connected to the pink cluster, showing that some of
+        the old songs are similar to the new ones, despite the temporal gap.
+    </p>
+
+    <h2 class="subheadings">Conclusion</h2>
+    <p>
+        In this project, we explored the use of MusiCNN, a set of musically motivated convolutional neural networks, to
+        automate the process of finding similarity between songs. The model performed moderately well at identifying
+        genres of music, but couldn't reliably differentiate between two singers and their voices. The model also showed
+        limited capability in distinguishing between the styles of music directors. However the model displayed accurate
+        clustering for different decades of songs, proving that it can detect temporal trends in music.
+    </p>
+
+    <p>
+        Overall, the project demonstrated that MusiCNN can be a useful tool for identifying similarities between songs,
+        but its effectiveness can vary depending on the dataset's size, diversity, and the specific attributes being
+        compared. The code for this project can be found at the 
+        <a href="https://github.com/Rohit-Sangubotla/Music_Similarity">github</a> repository for this. If you want 
+        to get an idea about the code behind the data analysis itself, I'd suggest reading through 
+        <a href="https://github.com/Rohit-Sangubotla/Music_Similarity/blob/main/scripts/Music_similarity.ipynb">
+            this notebook
+        </a> .
+        Thank you for reading!
+        
+    </p>
+    <script src="script.js" type="module"></script>
 </body>
+
 </html>
