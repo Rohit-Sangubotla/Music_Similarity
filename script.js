@@ -110,7 +110,6 @@ document.addEventListener("DOMContentLoaded", function () {
             const thead = document.createElement('thead');
             const tbody = document.createElement('tbody');
 
-            console.log(headers);
             const headerRow = document.createElement('tr');
             let ts = document.createElement('th');
             ts.textContent = 'Sr No.';
